@@ -9,7 +9,7 @@ License: GPL (>= 2)
 Depends:
     R (>= 4.1)
 Imports:  
-    rsq (>= 2.2),stats,
+    stats,
     Hmisc (>= 4.6-0),
     ggplot2 (>= 3.3.5),
     MASS (>= 7.3),
