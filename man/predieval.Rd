@@ -42,7 +42,7 @@ For the case of a binary outcome this should be probabilities of an event.}
 A table with all estimated measures of performance.
 }
 \description{
-This function calculates a series of measures to assess decision accuract, discrimination for benefit, and calibration for benefit of a prediction model.
+This function calculates a series of measures to assess decision accuracy, discrimination for benefit, and calibration for benefit of a prediction model.
 }
 \examples{
  # continuous outcome

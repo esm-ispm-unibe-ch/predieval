@@ -168,7 +168,7 @@ predieval<-function(repeats=50,
     rmse.m1<-c()
     coeff.m11<-c()
     coeff.m12<-c()
-    rsq.m1<-c()
+    R.2.m1<-c()
     results.kmeans<-list()
     percent1.s2<-list()
     for(n in 1:Ngroups.length){
@@ -204,7 +204,7 @@ predieval<-function(repeats=50,
         reg.m1<-summary(lm(dall$observed.groups~dall$estimated.groups.m1, weights= dall$ngroups))
         coeff.m11<-c( coeff.m11, coef(reg.m1)[1])
         coeff.m12<-c( coeff.m12,coef(reg.m1)[2])
-        rsq.m1<-c(rsq.m1, reg.m1$r.squared)
+        R.2.m1<-c(R.2.m1, reg.m1$r.squared)
         rmse.m1<-c(rmse.m1, sqrt(mean((dall$observed.groups-dall$estimated.groups.m1)^2))) }
       # summary
       percent1.s2[[n]]<-round(mean(percent.s2), digits=2)
@@ -212,7 +212,7 @@ predieval<-function(repeats=50,
       results.kmeans[[n]]<-data.frame(rmse= round(median(rmse.m1),digits=2),
                                       a0= round(median(coeff.m11),digits=2),
                                       a1= round(median(coeff.m12),digits=2),
-                                      R2= round(median(rsq.m1),digits=2)  )
+                                      R2= round(median(R.2.m1),digits=2)  )
     }
 
     # match by X ---
@@ -502,7 +502,7 @@ predieval<-function(repeats=50,
 
 
     # match via kmeans
-    rmse.m<-coeff.1<-coeff.2<-rsq.m<-c()
+    rmse.m<-coeff.1<-coeff.2<-R.2.m<-c()
     results.kmeans.bin<-list()
     percent1.s2<-list()
     for(n in 1:Ngroups.length){
@@ -541,7 +541,7 @@ predieval<-function(repeats=50,
         reg=summary(lm(dall$observed.groups~dall$estimated.groups))
         coeff.1=c( coeff.1, coef(reg)[1])
         coeff.2=c( coeff.2,coef(reg)[2])
-        rsq.m=c(rsq.m, reg$r.squared)
+        R.2.m=c(R.2.m, reg$r.squared)
         rmse.m=c(rmse.m, sqrt(mean((dall$observed.groups-dall$estimated.groups)^2)))
       }
       # summary
@@ -549,7 +549,7 @@ predieval<-function(repeats=50,
       results.kmeans.bin[[n]]<-data.frame(rmse= round(median(rmse.m),digits=3),
                                           a0= round(median(coeff.1),digits=2),
                                           a1= round(median(coeff.2),digits=2),
-                                          R2= round(median(rsq.m),digits=2)  )
+                                          R2= round(median(R.2.m),digits=2)  )
     }
 
     results=data.frame(Method=c(paste("kmeans N=",Ngroups[1], sep="")),
