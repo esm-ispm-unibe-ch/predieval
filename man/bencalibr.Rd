@@ -43,9 +43,9 @@ be "lm", "glm", "gam", "loess", "rlm". More details can be found in https://ggpl
 The calibration plot
 }
 \description{
-This function produces plot to illustrate the calibration for benefit
-for a prediction model. The data are split in a number of groups according
-to the predicted benefit, and within each group the functions estimates
+This function produces a plot to illustrate the calibration for benefit
+for a prediction model. The samples are split in a number of groups according
+to their predicted benefit, and within each group the bencalibr function estimates
 the observed treatment benefit and compares it with the predicted one
 according to the prediction model
 }

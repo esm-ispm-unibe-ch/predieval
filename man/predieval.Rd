@@ -42,10 +42,7 @@ For the case of a binary outcome this should be probabilities of an event.}
 A table with all estimated measures of performance.
 }
 \description{
-This function calculates a series of measures to assess the calibration for benefit of a prediction model.
-For a continuous outcome it uses a one-to-one matching of patients based on covariates or
-predicted treatment benefit. It also uses a matching in groups using the k-means algorithm. It
-also fits a regression line for benefit. For a binary outcome it also calculates the c-for-benefit.
+This function calculates a series of measures to assess decision accuract, discrimination for benefit, and calibration for benefit of a prediction model.
 }
 \examples{
  # continuous outcome

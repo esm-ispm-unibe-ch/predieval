@@ -15,5 +15,6 @@ Imports:
     MASS (>= 7.3),
     Matching (>= 4.9-11)
 Encoding: UTF-8
+URL: https://github.com/esm-ispm-unibe-ch/predieval
 LazyData: true
 RoxygenNote: 7.1.2
