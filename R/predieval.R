@@ -573,8 +573,8 @@ predieval<-function(repeats=50,
 
     dat1$pred.t1<-predicted.treat.1
     dat1$pred.t0<-predicted.treat.0
-    dat1$benefit<-dat1$pred.t1-dat1$pred.t0
-    glm1=glm(dat1$Y~dat1$pred.t0+dat1$t:dat1$benefit, family=binomial)
+    dat1$benefit.lm<-logit(dat1$pred.t1)-logit(dat1$pred.t0)
+    glm1=glm(dat1$Y~dat1$pred.t0+dat1$t:dat1$benefit.lm, family=binomial)
     ci1=confint(glm1)
     slope.ben=paste(round(summary(glm1)$coef[3],digits=2)," [",round( ci1[3,1],digits=2),"; " ,round(ci1[3,2], digits=2),"]", sep="")
 
