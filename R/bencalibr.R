@@ -179,8 +179,7 @@ bencalibr<-function (data = NULL, ### a dataframe with model predictions and obs
                               se.obs, ymax = obs + se.obs), width = 0.005) +
       geom_errorbarh(aes(xmin = pred - se.pred, xmax = pred +
                            se.pred), height = 0.005) + geom_smooth(method = smoothing.function,
-                                                                   colour = "blue", size = 0.5) + theme(aspect.ratio = 1) +
-      ggtitle("Calibration for benefit (measure: risk difference)")
+                                                                   colour = "blue", size = 0.5) + theme(aspect.ratio = 1)
     r1 <- max((suppressMessages(layer_scales(p2))$x$range$range))
     r2 <- min((suppressMessages(layer_scales(p2)$x$range$range)))
     s1 <- max((suppressMessages(layer_scales(p2)$y$range$range)))

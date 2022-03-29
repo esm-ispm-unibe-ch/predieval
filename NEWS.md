@@ -1,6 +1,7 @@
 # predieval, version 0.1.1
 
-- bug fixes: predieval() reported wrong regression for benefit slope, for binary outcomes
+- bug fix predieval(): reported wrong regression for benefit slope, for binary outcomes
+- bug fix bencalibr(): removed title of the plot for binary outcomes
 
 # predieval, version 0.1.0
 
