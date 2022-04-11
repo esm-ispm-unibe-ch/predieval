@@ -68,7 +68,7 @@ dat2.t0=dat2; dat2.t0$t=0
 dat2.t1=dat2; dat2.t1$t=1
 dat2$predict.treat.1=predict(glm1, newdata = dat2.t1) # predictions in treatment
 dat2$predict.treat.0=predict(glm1, newdata = dat2.t0) # predicions in control
-bencalibr(data=dat2, Ngroups=6, y.observed, predicted.treat.1=predict.treat.1,
-          predicted.treat.0=predict.treat.0, type="binary", treat=t,
+bencalibr(data=dat2, Ngroups=6, y.observed, predicted.treat.1=expit(predict.treat.1),
+          predicted.treat.0=expit(predict.treat.0), type="binary", treat=t,
           smoothing.function = "lm")
 }
