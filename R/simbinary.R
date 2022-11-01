@@ -5,7 +5,7 @@
 #' @param Npat Number of patients to simulate.
 #' @return The function returns a dataframe with:
 #'
-#' x1, x2, x3, x4, x5, x6= patient covariates.
+#' x1, x2, x3, x4, x5: patient covariates.
 #'
 #' t= treatment assignment (0 for control, 1 for active).
 #'
@@ -29,24 +29,24 @@
 simbinary<-function (Npat = 100)
 {
   x1x2 = mvrnorm(n = Npat, c(0, 0), Sigma = matrix(c(1, 0.2,
-                                                      0.2, 1), 2, 2))
+                                                     0.2, 1), 2, 2))
   simdat = data.frame(x1 = x1x2[, 1])
   simdat$x2 = x1x2[, 2]
   simdat$x3 = rbinom(Npat, 1, prob = 0.2)
-  simdat$x4 = rnorm(Npat, 0, 1)
-  simdat$x5 = rnorm(Npat, 0, 1)
-  simdat$x6 = rnorm(Npat, 0, 1)
+  simdat$x4 = rbinom(Npat, 1, prob = 0.1)
+
   pt <- 0.5
   simdat$t <- rbinom(Npat, 1, prob = pt)
-  simdat$logit.control <- with(simdat, -2 + 0.5 * x1 + 0.2 *
-                                 x2 + 0.3 * x3 + 0.3 * x4 + rnorm(Npat, 0, 0.1))
-  simdat$benefit = with(simdat, -0.1 - 0.2 * x1 - 0.1 * x2 +
-                           0.2 * x3 + 0.1 * x4 + rnorm(Npat, 0, 0.01))
+  simdat$logit.control <- with(simdat, -2 + 0.5 * x1 + 0.4 *
+                                 x2 + 0.3 * x3 + 0.5 * x4  )
+  simdat$benefit = with(simdat, -0.3+0.3*x1+0.2*x3+0.1*x4)
   simdat$logit.active = with(simdat, logit.control + benefit)
-  simdat$logit.py = with(simdat, logit.control + t * benefit)
+  simdat$logit.py = with(simdat, logit.control*(t==0) + logit.active*(t==1))
   simdat$py <- expit(simdat$logit.py)
   simdat$y.observed = rbinom(Npat, 1, prob = simdat$py)
   return(list(dat = simdat))
+
+
 }
 
 
