@@ -5,7 +5,7 @@
 #' @param Npat Number of patients to simulate.
 #' @return The function returns a dataframe with:
 #'
-#' x1, x2, x3, x4, x5: patient covariates.
+#' x1, x2, x3, x4: patient covariates.
 #'
 #' t= treatment assignment (0 for control, 1 for active).
 #'
