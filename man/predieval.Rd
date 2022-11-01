@@ -13,7 +13,8 @@ predieval(
   predicted.treat.1,
   predicted.treat.0,
   type = "continuous",
-  bootstraps = 500
+  bootstraps = 500,
+  Threshold = 0
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ For the case of a binary outcome this should be probabilities of an event.}
 \item{type}{The type of the outcome, "binary" or "continuous".}
 
 \item{bootstraps}{The number of bootstrap samples to be used for calculating confidence intervals.}
+
+\item{Threshold}{Threshold for treatment benefit}
 }
 \value{
 A table with all estimated measures of performance.

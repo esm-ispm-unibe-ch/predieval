@@ -13,6 +13,7 @@
 #' For the case of a binary outcome this should be probabilities of an event.
 #' @param type The type of the outcome, "binary" or "continuous".
 #' @param bootstraps The number of bootstrap samples to be used for calculating confidence intervals.
+#' @param Threshold Threshold for treatment benefit
 #' @return A table with all estimated measures of performance.
 #' @importFrom Matching Match
 #' @importFrom Hmisc rcorr.cens
