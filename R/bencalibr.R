@@ -32,7 +32,7 @@
 
 #' bencalibr(data=dat1, Ngroups=10, y.observed, predicted.treat.1=predict.treat.1,
 #'           predicted.treat.0=predict.treat.0, type="continuous", treat=t,
-#'           smoothing.function = "lm", axis.limits = c(-1, 1.3))
+#'           smoothing.function = "lm", axis.limits = c(-2, 2))
 #' # binary outcome
 #' dat2=simbinary(500)$dat
 #' head(dat2)
