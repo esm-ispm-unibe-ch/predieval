@@ -2,7 +2,7 @@ Package: predieval
 Type: Package
 Title: Assessing Performance of Prediction Models for Predicting Patient-Level Treatment Benefit
 Version: 0.1.2
-Date: 2022-11-1
+Date: 2022-11-01
 Author: Orestis Efthimiou
 Maintainer: Orestis Efthimiou <oremiou@gmail.com>
 Description: Methods for assessing the performance of a prediction model with respect to identifying patient-level treatment benefit. All methods are applicable for continuous and binary outcomes, and for any type of statistical or machine-learning prediction model as long as it uses baseline covariates to predict outcomes under treatment and control. 
