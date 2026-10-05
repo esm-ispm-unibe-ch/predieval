@@ -83,48 +83,52 @@
 
 #'
 #' @export
-predieval<-function(repeats=50,
-                     Ngroups=10,
-                     X,
-                     treat,
-                     Y,
-                     predicted.treat.1,
-
-                     predicted.treat.0,
-                     type="continuous",
-                     bootstraps=500, Threshold=0
-){
+predieval<-function (repeats = 50, Ngroups = 10, X, treat, Y, predicted.treat.1,
+                     predicted.treat.0, type = "continuous", bootstraps = 500,
+                     Threshold = 0)
+{
   Ngroups.length = length(Ngroups)
   if (type == "continuous") {
     cat(" Type of outcome: continuous", "\n", "Repeats: ",
         repeats, "\n")
     dat1 <- data.frame(cbind(X, Y = c(Y), t = treat, benefit = predicted.treat.1 -
                                predicted.treat.0))
-
-    # PB
-    g11 <- dat1[dat1$benefit > Threshold & dat1$t == 1, ]
+    g11 <- dat1[dat1$benefit > Threshold & dat1$t == 1,
+    ]
     n11 <- length(g11$benefit)
-    g12 <- dat1[dat1$benefit > Threshold & dat1$t == 0, ]
+    g12 <- dat1[dat1$benefit > Threshold & dat1$t == 0,
+    ]
     n12 <- length(g12$benefit)
-    g13 <- dat1[dat1$benefit < Threshold & dat1$t == 1, ]
+    g13 <- dat1[dat1$benefit < Threshold & dat1$t == 1,
+    ]
     n13 <- length(g13$benefit)
-    g14 <- dat1[dat1$benefit < Threshold & dat1$t == 0, ]
+    g14 <- dat1[dat1$benefit < Threshold & dat1$t == 0,
+    ]
     n14 <- length(g14$benefit)
-
-
-    if (n11<5|n12<5|n13<5|n14<5){
-      stop(call.=F, paste("The chosen value for benefit threshold, (Threshold=",Threshold,
-                          "), is either too large or too small compared to the predicted benefit. Population Benefit cannot be estimated. Please change the benefit threshold.",sep=""))
-
+    N <- n11 + n12 + n13 + n14
+    if (n11 < 5 | n12 < 5 | n13 < 5 | n14 < 5) {
+      stop(call. = F, paste("The chosen value for benefit threshold, (Threshold=",
+                            Threshold, "), is either too large or too small compared to the predicted benefit. Population Benefit cannot be estimated. Please change the benefit threshold.",
+                            sep = ""))
     }
-    dat1$agree1 <- (sign(dat1$benefit-Threshold) == sign(2 * dat1$t -
-                                                           1))
+    dat1$agree1 <- (sign(dat1$benefit - Threshold) == sign(2 *
+                                                             dat1$t - 1))
     dat.disc <- cbind(Y = dat1$Y, agree1 = dat1$agree1,
                       X)
     s1 <- summary(lm(Y ~ ., data = dat.disc))$coef[2, ]
     discr.1 <- (paste(round(s1[1], digits = 2), " [", round(s1[1] -
                                                               1.96 * s1[2], digits = 2), "; ", round(s1[1] + 1.96 *
                                                                                                        s1[2], digits = 2), "]", sep = ""))
+    PB_new <- (n11 + n12)/N * mean(g11$Y) + (n13 + n14)/N *
+      mean(g14$Y) - (n11 + n12)/N * mean(g12$Y) - (n13 +
+                                                     n14)/N * mean(g13$Y)
+    var.PB.new = (n11 + n12)^2/N^2 * var(g11$Y)/n11 + (n13 +
+                                                         n14)^2/N^2 * var(g14$Y)/n14 + (n11 + n12)^2/N^2 *
+      var(g12$Y)/n12 + (n13 + n14)^2/N^2 * var(g13$Y)/n13
+    discr.1.new <- paste(round(PB_new, digits = 2), " [",
+                         round(PB_new - 1.96 * sqrt(var.PB.new), digits = 2),
+                         "; ", round(PB_new + 1.96 * sqrt(var.PB.new), digits = 2),
+                         "]", sep = "")
     PB0 <- sum(g11$Y)/(n11 + n14) - sum(g12$Y)/(n12 + n14) +
       sum(g14$Y) * (1/(n11 + n14) - 1/(n12 + n14))
     var.PB0 <- n11 * var(g11$Y)/(n11 + n14)^2 + n12 * var(g12$Y)/(n12 +
@@ -133,6 +137,14 @@ predieval<-function(repeats=50,
     discr.2 <- paste(round(PB0, digits = 2), " [", round(PB0 -
                                                            1.96 * sqrt(var.PB0), digits = 2), "; ", round(PB0 +
                                                                                                             1.96 * sqrt(var.PB0), digits = 2), "]", sep = "")
+    PB0.new = (1/n11 * sum(g11$Y) - 1/n12 * sum(g12$Y)) *
+      (n11 + n12)/N
+    var.PB0.new = (1/n11 * var(g11$Y) + 1/n12 * var(g12$Y)) *
+      (n11 + n12)^2/N^2
+    discr.2.new <- paste(round(PB0.new, digits = 2), " [",
+                         round(PB0.new - 1.96 * sqrt(var.PB0.new), digits = 2),
+                         "; ", round(PB0.new + 1.96 * sqrt(var.PB0.new),
+                                     digits = 2), "]", sep = "")
     PB1 <- sum(g14$Y)/(n11 + n14) - sum(g13$Y)/(n11 + n13) +
       sum(g11$Y) * (1/(n11 + n14) - 1/(n11 + n13))
     var.PB1 <- n14 * var(g14$Y)/(n11 + n14)^2 + n13 * var(g13$Y)/(n11 +
@@ -141,8 +153,14 @@ predieval<-function(repeats=50,
     discr.3 <- paste(round(PB1, digits = 2), " [", round(PB1 -
                                                            1.96 * sqrt(var.PB1), digits = 2), "; ", round(PB1 +
                                                                                                             1.96 * sqrt(var.PB1), digits = 2), "]", sep = "")
-
-
+    PB1.new <- (1/n14 * sum(g14$Y) - 1/n13 * sum(g13$Y)) *
+      (n13 + n14)/N
+    var.PB1.new <- (1/n14 * var(g14$Y) + 1/n13 * var(g13$Y)) *
+      (n13 + n14)^2/N^2
+    discr.3.new <- paste(round(PB1.new, digits = 2), " [",
+                         round(PB1.new - 1.96 * sqrt(var.PB1.new), digits = 2),
+                         "; ", round(PB1.new + 1.96 * sqrt(var.PB1.new),
+                                     digits = 2), "]", sep = "")
     mean.bias <- mean(dat1$Y[dat1$t == 1]) - mean(dat1$Y[dat1$t ==
                                                            0]) - mean(dat1$benefit)
     rmse.reg <- c()
@@ -253,8 +271,9 @@ predieval<-function(repeats=50,
                                                  dataall$benefit[matched$index.control])/2)
       data.compare$obs.benefit <- with(data.compare, tr.obs -
                                          ctr.obs)
-      percentX.s22 <- c(percentX.s22, mean(sign(data.compare$obs.benefit-Threshold) ==
-                                             sign(data.compare$benefit.m1-Threshold)))
+      percentX.s22 <- c(percentX.s22, mean(sign(data.compare$obs.benefit -
+                                                  Threshold) == sign(data.compare$benefit.m1 -
+                                                                       Threshold)))
       rmse.m1 <- c(rmse.m1, sqrt(mean((data.compare$obs.benefit -
                                          data.compare$benefit.m1)^2)))
       reg.m1 <- lm(data.compare$obs.benefit ~ data.compare$benefit.m1)
@@ -283,8 +302,9 @@ predieval<-function(repeats=50,
                                                  dataall$benefit[matched1$index.control])/2)
       data.compare$obs.benefit <- with(data.compare, tr.obs -
                                          ctr.obs)
-      percentB.s2 <- c(percentB.s2, mean(sign(data.compare$obs.benefit-Threshold) ==
-                                           sign(data.compare$benefit.m1-Threshold)))
+      percentB.s2 <- c(percentB.s2, mean(sign(data.compare$obs.benefit -
+                                                Threshold) == sign(data.compare$benefit.m1 -
+                                                                     Threshold)))
       rmse.m1 <- c(rmse.m1, sqrt(mean((data.compare$obs.benefit -
                                          data.compare$benefit.m1)^2)))
       reg.m1 <- lm(data.compare$obs.benefit ~ data.compare$benefit.m1)
@@ -293,10 +313,12 @@ predieval<-function(repeats=50,
       m1.R2 = c(m1.R2, summary(reg.m1)$r.squared)
     }
     results.d <- data.frame(`Estimand, estimation method` = c("Population-level benefit (PB), adjusted",
-                                                              "Population-level benefit vs t=0 (PB0)", "Population-level benefit vs t=1 (PB1)",
-                                                              paste("Benefit accuracy (BA), k-means N=", Ngroups[1],
-                                                                    sep = "")), Estimate = c(discr.1, discr.2, discr.3,
-                                                                                             round(percent1.s2[[1]], digits = 2)), check.names = F)
+                                                              "PB - alternative estimator", "Population-level benefit vs t=0 (PB0)",
+                                                              "PB0 - alternative estimator", "Population-level benefit vs t=1 (PB1)",
+                                                              "PB1 - alternative estimator", paste("Benefit accuracy (BA), k-means N=",
+                                                                                                   Ngroups[1], sep = "")), Estimate = c(discr.1,
+                                                                                                                                        discr.1.new, discr.2, discr.2.new, discr.3, discr.3.new,
+                                                                                                                                        round(percent1.s2[[1]], digits = 2)), check.names = F)
     results.after.matching.benefit = data.frame(rmse = round(median(rmse.m1),
                                                              digits = 2), a0 = round(median(m1.a0), digits = 2),
                                                 a1 = round(median(m1.a1), digits = 2), R2 = round(median(m1.R2),
@@ -347,12 +369,10 @@ predieval<-function(repeats=50,
                         mean.bias = mean.bias)
   }
   if (type == "binary") {
-
-    if (min(c(predicted.treat.1,predicted.treat.0))<0 | max(c(predicted.treat.1,predicted.treat.0))>1){
-      stop(call.=F, paste("The provided probabilities lie outside the [0,1] range."))
+    if (min(c(predicted.treat.1, predicted.treat.0)) < 0 |
+        max(c(predicted.treat.1, predicted.treat.0)) > 1) {
+      stop(call. = F, paste("The provided probabilities lie outside the [0,1] range."))
     }
-
-
     cat(" Type of outcome: binary", "\n", "Repeats: ", repeats,
         "\n", "Number of bootstraps for caclulating confidence intervals: ",
         bootstraps, "\n")
@@ -367,16 +387,14 @@ predieval<-function(repeats=50,
     n13 = length(g13$benefit)
     g14 = dat1[dat1$benefit < Threshold & dat1$t == 0, ]
     n14 = length(g14$benefit)
-
-    if (n11<5|n12<5|n13<5|n14<5){
-      stop(call.=F, paste("The chosen value for benefit threshold, (Threshold=",Threshold,
-                          "), is either too large or too small compared to the predicted benefit. Population Benefit cannot be estimated. Please change the benefit threshold.",sep=""))
-
+    N <- n11 + n12 + n13 + n14
+    if (n11 < 5 | n12 < 5 | n13 < 5 | n14 < 5) {
+      stop(call. = F, paste("The chosen value for benefit threshold, (Threshold=",
+                            Threshold, "), is either too large or too small compared to the predicted benefit. Population Benefit cannot be estimated. Please change the benefit threshold.",
+                            sep = ""))
     }
-
-
-    dat1$agree = 1 * (sign(dat1$benefit-Threshold) == sign(2 * dat1$t -
-                                                             1))
+    dat1$agree = 1 * (sign(dat1$benefit - Threshold) ==
+                        sign(2 * dat1$t - 1))
     dat.disc = cbind(Y = dat1$Y, agree = dat1$agree, X)
     magree = glm(Y ~ ., data = dat.disc, family = "binomial")
     d.test0 = dat.disc
@@ -399,25 +417,50 @@ predieval<-function(repeats=50,
       return(p1 - p0)
     }
     bootest <- unlist(lapply(1:bootstraps, function(x) bootdif(dat.disc)))
-    da.1 = paste(round(S1mean, digits = 3), " [", round(quantile(bootest,
-                                                                 c(0.025, 0.975))[1], digits = 3), "; ", round(quantile(bootest,
-                                                                                                                        c(0.025, 0.975))[2], digits = 3), "]", sep = "")
+    PB = paste(round(S1mean, digits = 3), " [", round(quantile(bootest,
+                                                               c(0.025, 0.975))[1], digits = 3), "; ", round(quantile(bootest,
+                                                                                                                      c(0.025, 0.975))[2], digits = 3), "]", sep = "")
+    PB_new <- (n11 + n12)/N * mean(g11$Y) + (n13 + n14)/N *
+      mean(g14$Y) - (n11 + n12)/N * mean(g12$Y) - (n13 +
+                                                     n14)/N * mean(g13$Y)
+    var.PB.new = (n11 + n12)^2/N^2 * var(g11$Y)/n11 + (n13 +
+                                                         n14)^2/N^2 * var(g14$Y)/n14 + (n11 + n12)^2/N^2 *
+      var(g12$Y)/n12 + (n13 + n14)^2/N^2 * var(g13$Y)/n13
+    PB.new <- paste(round(PB_new, digits = 2), " [", round(PB_new -
+                                                             1.96 * sqrt(var.PB.new), digits = 2), "; ", round(PB_new +
+                                                                                                                 1.96 * sqrt(var.PB.new), digits = 2), "]", sep = "")
     PB0 = sum(g11$Y)/(n11 + n14) - sum(g12$Y)/(n12 + n14) +
       sum(g14$Y) * (1/(n11 + n14) - 1/(n12 + n14))
     var.PB0 = n11 * var(g11$Y)/(n11 + n14)^2 + n12 * var(g12$Y)/(n12 +
                                                                    n14)^2 + n14 * var(g14$Y) * (1/(n11 + n14) - 1/(n12 +
                                                                                                                      n14))^2
-    da.2 = paste(round(PB0, digits = 3), " [", round(PB0 -
+    PB.0 = paste(round(PB0, digits = 3), " [", round(PB0 -
                                                        1.96 * sqrt(var.PB0), digits = 3), "; ", round(PB0 +
                                                                                                         1.96 * sqrt(var.PB0), digits = 3), "]", sep = "")
+    PB0.new = (1/n11 * sum(g11$Y) - 1/n12 * sum(g12$Y)) *
+      (n11 + n12)/N
+    var.PB0.new = (1/n11 * var(g11$Y) + 1/n12 * var(g12$Y)) *
+      (n11 + n12)^2/N^2
+    PB.0.new <- paste(round(PB0.new, digits = 2), " [",
+                      round(PB0.new - 1.96 * sqrt(var.PB0.new), digits = 2),
+                      "; ", round(PB0.new + 1.96 * sqrt(var.PB0.new),
+                                  digits = 2), "]", sep = "")
     PB1 = sum(g14$Y)/(n11 + n14) - sum(g13$Y)/(n11 + n13) +
       sum(g11$Y) * (1/(n11 + n14) - 1/(n11 + n13))
     var.PB1 = n14 * var(g14$Y)/(n11 + n14)^2 + n13 * var(g13$Y)/(n11 +
                                                                    n13)^2 + n11 * var(g11$Y) * (1/(n11 + n14) - 1/(n11 +
                                                                                                                      n13))^2
-    da.3 = paste(round(PB1, digits = 3), " [", round(PB1 -
+    PB.1 = paste(round(PB1, digits = 3), " [", round(PB1 -
                                                        1.96 * sqrt(var.PB1), digits = 3), "; ", round(PB1 +
                                                                                                         1.96 * sqrt(var.PB1), digits = 3), "]", sep = "")
+    PB1.new <- (1/n14 * sum(g14$Y) - 1/n13 * sum(g13$Y)) *
+      (n13 + n14)/N
+    var.PB1.new <- (1/n14 * var(g14$Y) + 1/n13 * var(g13$Y)) *
+      (n13 + n14)^2/N^2
+    PB.1.new <- paste(round(PB1.new, digits = 2), " [",
+                      round(PB1.new - 1.96 * sqrt(var.PB1.new), digits = 2),
+                      "; ", round(PB1.new + 1.96 * sqrt(var.PB1.new),
+                                  digits = 2), "]", sep = "")
     percent.1on1.ben = c()
     c.by.benefit = c()
     se.c.by.benefit = c()
@@ -445,8 +488,8 @@ predieval<-function(repeats=50,
       obs.ben <- obs.out.1 - obs.out.0
       pred.ben.avg2 = pred.ben.avg[obs.ben != 0]
       obs.ben2 = obs.ben[obs.ben != 0]
-      percent.1on1.ben = c(percent.1on1.ben, mean(sign(obs.ben2-Threshold) ==
-                                                    sign(pred.ben.avg2-Threshold)))
+      percent.1on1.ben = c(percent.1on1.ben, mean(sign(obs.ben2 -
+                                                         Threshold) == sign(pred.ben.avg2 - Threshold)))
       cindex <- rcorr.cens(pred.ben.avg, obs.ben)
       c.by.benefit <- c(c.by.benefit, cindex["C Index"][[1]])
       se.c.by.benefit <- c(se.c.by.benefit, cindex["S.D."][[1]]/2)
@@ -463,8 +506,8 @@ predieval<-function(repeats=50,
       obs.ben <- obs.out.1 - obs.out.0
       pred.ben.avg2 = pred.ben.avg[obs.ben != 0]
       obs.ben2 = obs.ben[obs.ben != 0]
-      percent.1on1.X = c(percent.1on1.X, mean(sign(obs.ben2-Threshold) ==
-                                                sign(pred.ben.avg2-Threshold)))
+      percent.1on1.X = c(percent.1on1.X, mean(sign(obs.ben2 -
+                                                     Threshold) == sign(pred.ben.avg2 - Threshold)))
       cindex2 <- rcorr.cens(pred.ben.avg, obs.ben)
       c.by.covariates <- c(c.by.covariates, cindex2["C Index"][[1]])
       se.c.by.covariates <- c(se.c.by.covariates, cindex2["S.D."][[1]]/2)
@@ -597,10 +640,12 @@ predieval<-function(repeats=50,
     results.reg = data.frame(slope.ben)
     rownames(results.reg) = c("Estimate")
     results.DA = data.frame(`Estimand, estimation method` = c("Population-level benefit (PB), adjusted",
-                                                              "Population-level benefit vs t=0 (PB0)", "Population-level benefit vs t=1 (PB1)",
-                                                              paste("Benefit accuracy (BA), k-means N=", Ngroups[1],
-                                                                    sep = "")), Estimate = c(da.1, da.2, da.3, round(percent1.s2[[1]],
-                                                                                                                     digits = 2)), check.names = F)
+                                                              "PB - alternative estimator", "Population-level benefit vs t=0 (PB0)",
+                                                              "PB0 - alternative estimator", "Population-level benefit vs t=1 (PB1)",
+                                                              "PB1 - alternative estimator", paste("Benefit accuracy (BA), k-means N=",
+                                                                                                   Ngroups[1], sep = "")), Estimate = c(PB, PB.new,
+                                                                                                                                        PB.0, PB.0.new, PB.1, PB.1.new, round(percent1.s2[[1]],
+                                                                                                                                                                              digits = 2)), check.names = F)
     if (Ngroups.length > 1) {
       for (n in 2:Ngroups.length) {
         d1 <- data.frame(`Estimand, estimation method` = paste("Benefit accuracy (BA), k-means N=",
@@ -623,17 +668,4 @@ predieval<-function(repeats=50,
                        regression.for.benefit = results.reg, discrimination.for.benefit = results.discrimination)
   }
   return(results.all)
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
